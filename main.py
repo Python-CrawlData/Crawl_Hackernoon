@@ -4,13 +4,14 @@ import re
 import requests
 import json
 import urllib.parse
+from os import system, name
 
 ##
 # Define variable
 ##
 tag_api_url = 'https://mo7dwh9y8c-2.algolianet.com/1/indexes/*/queries'
 stories_api_url = 'https://mo7dwh9y8c-3.algolianet.com/1/indexes/*/queries'
-detail_stories_url = 'https://hackernoon.com/_next/data/Atz0ycXnBy2bZdzmmz8iJ/' # Change in each hours
+detail_stories_url = 'https://hackernoon.com/_next/data/UkeTBITpwJ9qTiVfTTTD6/' # Change in each hours
 get_parameters = {
     'x-algolia-agent': 'Algolia for JavaScript (4.1.0); Browser (lite); JS Helper (3.1.1); react (16.13.1); react-instantsearch (6.4.0)',
     'x-algolia-api-key': 'e0088941fa8f9754226b97fa87a7c340',
@@ -20,6 +21,13 @@ get_parameters = {
 ##
 # Define function
 ##
+def clear():
+    if name == 'nt': 
+        _ = system('cls') 
+    else: 
+        _ = system('clear') 
+
+
 def generatePostData(isTag=True, isFacet=False, hitsPerPage=10, pageIndex=0, tagName=''):
     indexName = 'tags'
     if (True == isFacet):
@@ -96,6 +104,15 @@ def getLinksInStory(htmlSource):
     return result
 
 
+def getImagesInStory(htmlSource):
+    soup = BeautifulSoup(htmlSource, "html.parser")
+    result = []
+    for img in soup.findAll('img'):
+        result.append(img.get('src'))
+    return result
+
+
+
 def cleanHtmlTagInStory(htmlSource):
     soup = BeautifulSoup(htmlSource, 'lxml')
     result = ''
@@ -107,18 +124,19 @@ def cleanHtmlTagInStory(htmlSource):
 ##
 # Execute code
 ##
-print('=========================================================')
 result = {}
 tags = getTags(page=0, limit=100)
 index = 0
 for t in tags:
     stories = getStories(page=0, limit=25, tag=t)
     for url, value in stories.items():
+        clear()
         print('Đã crawl được', index + 1, '/', 2500 ,'bài viết')
         detail = getDetailStory(url)
         links = getLinksInStory(detail)
+        imgs = getImagesInStory(detail)
         source = cleanHtmlTagInStory(detail)
-        value.update({'links': links, 'content': source})
+        value.update({'links': links, 'imgs': imgs, 'content': source})
         result.update({index: value})
         index = index + 1
 
@@ -126,7 +144,7 @@ for t in tags:
 ##
 # Save data into file
 ##
-print('=========================================================')
+clear()
 print('Saving data to file: hackernoon_data.json')
 json_data = json.dumps(result)
 file = open("hackernoon_data.json", "w")
