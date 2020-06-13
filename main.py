@@ -9,9 +9,10 @@ from os import system, name
 ##
 # Define variable
 ##
+get_sentry_code_url = 'https://hackernoon.com/tagged'
 tag_api_url = 'https://mo7dwh9y8c-2.algolianet.com/1/indexes/*/queries'
 stories_api_url = 'https://mo7dwh9y8c-3.algolianet.com/1/indexes/*/queries'
-detail_stories_url = 'https://hackernoon.com/_next/data/NCUGwUUyLGGjQ4vHrpM3K/' # Change in each hours
+detail_stories_url = 'https://hackernoon.com/_next/data/' # Change in each hours
 get_parameters = {
     'x-algolia-agent': 'Algolia for JavaScript (4.1.0); Browser (lite); JS Helper (3.1.1); react (16.13.1); react-instantsearch (6.4.0)',
     'x-algolia-api-key': 'e0088941fa8f9754226b97fa87a7c340',
@@ -51,6 +52,22 @@ def generatePostData(isTag=True, isFacet=False, hitsPerPage=10, pageIndex=0, tag
         'indexName': indexName,
         'params': urllib.parse.urlencode(params)
     }
+
+
+def getSentryCode():
+    response = requests.get(get_sentry_code_url)
+    if (response.status_code == 400):
+        print('Cannot get sentry code. Please try again!')
+        exit()
+    # Get sentry id in response content
+    pattern = r'\"buildId\":\"([a-zA-Z0-9-_]+)\"'
+    content = response._content.decode('UTF-8')
+    result = re.findall(pattern, content)
+    if (len(result) > 0):
+        return result[0]
+    else:
+        print('Cannot find sentry code in response. Please try again!')
+        exit()
 
 
 def getTags(page=0, limit=100):
@@ -129,6 +146,7 @@ def cleanHtmlTagInStory(htmlSource):
 # Execute code
 ##
 result = {}
+detail_stories_url = detail_stories_url + getSentryCode() + '/'
 tags = getTags(page=0, limit=limit_tag)
 index = 0
 for t in tags.values():
