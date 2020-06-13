@@ -41,8 +41,9 @@ def generatePostData(isTag=True, isFacet=False, hitsPerPage=10, pageIndex=0, tag
         'facets': '[]',
         'tagFilters': ''
     }
-    if (True == isFacet & 0 < tagName.len()):
-        params['facetFilters'] = '["tags:' + tagName + '"]'
+    if True == isFacet:
+        if 0 < len(tagName):
+            params['facetFilters'] = '["tags:' + tagName + '"]'
     return {
         'indexName': indexName,
         'params': urllib.parse.urlencode(params)
@@ -89,10 +90,15 @@ def getStories(page=0, limit=10, tag=''):
     return result
 
 
-def countTitle(stories, titleSearch):
+def getTitles(stories):
     titles = []
     for storie in stories.values():
         titles.append(storie['title'])
+    return titles
+
+
+def countTitle(stories, titleSearch):
+    titles = getTitles(stories)
     count = 0
     for title in titles:
         if titleSearch == title:
@@ -145,10 +151,10 @@ def cleanHtmlTagInStory(htmlSource):
 # Execute code
 ##
 result = {}
-tags = getTags(page=0, limit=5)
+tags = getTags(page=0, limit=3)
 index = 0
-for t in tags:
-    stories = removeDuplicateStory(getStories(page=0, limit=5, tag=t))
+for t in tags.values():
+    stories = getStories(page=0, limit=3, tag=t)
     for url, value in stories.items():
         clear()
         print('Đã crawl được', index + 1, '/', len(tags)*len(stories) ,'bài viết')
@@ -159,7 +165,6 @@ for t in tags:
         value.update({'links': links, 'imgs': imgs, 'content': source})
         result.update({index: value})
         index = index + 1
-
 
 ##
 # Save data into file
