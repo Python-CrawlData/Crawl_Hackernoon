@@ -82,6 +82,7 @@ def getStories(page=0, limit=10, tag=''):
                 'createdAt': story['createdAt'],
                 'submittedAt': story['submittedAt'],
                 'publishedAt': story['publishedAt'],
+                'slug': story['slug'],
                 'tags': story['tags']
             }
         })
@@ -101,12 +102,9 @@ def countTitle(stories, titleSearch):
 
 def removeDuplicateStory(stories):
     result = {}
-    slugs = stories.keys()
-    index = 0
     for element in stories.values():
         if countTitle(stories, element['title']) == 1:
-            result.update({slugs[index]: element})
-            index = index + 1
+            result.update({element['slug']: element})
     return result
 
 
