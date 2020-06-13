@@ -101,10 +101,11 @@ def countTitle(stories, titleSearch):
 
 def removeDuplicateStory(stories):
     result = {}
+    slugs = stories.keys()
     index = 0
     for element in stories.values():
         if countTitle(stories, element['title']) == 1:
-            result.update({index: element})
+            result.update({slugs[index]: element})
             index = index + 1
     return result
 
@@ -152,7 +153,7 @@ for t in tags:
     stories = removeDuplicateStory(getStories(page=0, limit=5, tag=t))
     for url, value in stories.items():
         clear()
-        print('Đã crawl được', index + 1, '/', 2500 ,'bài viết')
+        print('Đã crawl được', index + 1, '/', len(tags)*len(stories) ,'bài viết')
         detail = getDetailStory(url)
         links = getLinksInStory(detail)
         imgs = getImagesInStory(detail)
