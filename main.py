@@ -88,12 +88,26 @@ def getStories(page=0, limit=10, tag=''):
     return result
 
 
+def countTitle(stories, titleSearch):
+    titles = []
+    for storie in stories.values():
+        titles.append(storie['title'])
+    count = 0
+    for title in titles:
+        if titleSearch == title:
+            count = count + 1
+    return count
+
+
 def removeDuplicateStory(stories):
-    keys = list(set(list(stories.keys())))
     result = {}
-    for key in keys:
-        result[key] = stories[key]
+    index = 0
+    for element in stories.values():
+        if countTitle(stories, element['title']) == 1:
+            result.update({index: element})
+            index = index + 1
     return result
+
 
 def getDetailStory(url):
     response = requests.get(detail_stories_url + url + '.json')
