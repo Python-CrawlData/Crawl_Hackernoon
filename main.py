@@ -78,13 +78,12 @@ def getStories(page=0, limit=10, tag=''):
     for story in stories:
         result.update({
             story['slug']: {
-                'title': story['title'],
-                'author': story['profile']['displayName'],
-                'createdAt': story['createdAt'],
-                'submittedAt': story['submittedAt'],
-                'publishedAt': story['publishedAt'],
-                'slug': story['slug'],
-                'tags': story['tags']
+                'title': story.get('title', 'unknown'),
+                'author': story.get('profile')['displayName'],
+                'createdAt': story.get('createdAt', 0),
+                'submittedAt': story.get('submittedAt', 0),
+                'publishedAt': story.get('publishedAt', 0),
+                'tags': story.get('tags', [])
             }
         })
     return result
