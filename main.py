@@ -11,7 +11,7 @@ from os import system, name
 ##
 tag_api_url = 'https://mo7dwh9y8c-2.algolianet.com/1/indexes/*/queries'
 stories_api_url = 'https://mo7dwh9y8c-3.algolianet.com/1/indexes/*/queries'
-detail_stories_url = 'https://hackernoon.com/_next/data/UkeTBITpwJ9qTiVfTTTD6/' # Change in each hours
+detail_stories_url = 'https://hackernoon.com/_next/data/NCUGwUUyLGGjQ4vHrpM3K/' # Change in each hours
 get_parameters = {
     'x-algolia-agent': 'Algolia for JavaScript (4.1.0); Browser (lite); JS Helper (3.1.1); react (16.13.1); react-instantsearch (6.4.0)',
     'x-algolia-api-key': 'e0088941fa8f9754226b97fa87a7c340',
@@ -88,6 +88,13 @@ def getStories(page=0, limit=10, tag=''):
     return result
 
 
+def removeDuplicateStory(stories):
+    keys = list(set(list(stories.keys())))
+    result = {}
+    for key in keys:
+        result[key] = stories[key]
+    return result
+
 def getDetailStory(url):
     response = requests.get(detail_stories_url + url + '.json')
     if (response.status_code == 400):
@@ -125,10 +132,10 @@ def cleanHtmlTagInStory(htmlSource):
 # Execute code
 ##
 result = {}
-tags = getTags(page=0, limit=100)
+tags = getTags(page=0, limit=5)
 index = 0
 for t in tags:
-    stories = getStories(page=0, limit=25, tag=t)
+    stories = removeDuplicateStory(getStories(page=0, limit=5, tag=t))
     for url, value in stories.items():
         clear()
         print('Đã crawl được', index + 1, '/', 2500 ,'bài viết')
