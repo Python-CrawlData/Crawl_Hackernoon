@@ -17,6 +17,9 @@ get_parameters = {
     'x-algolia-api-key': 'e0088941fa8f9754226b97fa87a7c340',
     'x-algolia-application-id': 'MO7DWH9Y8C'
 }
+limit_tag = 100
+limit_story = 25
+
 
 ##
 # Define function
@@ -89,30 +92,6 @@ def getStories(page=0, limit=10, tag=''):
     return result
 
 
-def getTitles(stories):
-    titles = []
-    for storie in stories.values():
-        titles.append(storie['title'])
-    return titles
-
-
-def countTitle(stories, titleSearch):
-    titles = getTitles(stories)
-    count = 0
-    for title in titles:
-        if titleSearch == title:
-            count = count + 1
-    return count
-
-
-def removeDuplicateStory(stories):
-    result = {}
-    for element in stories.values():
-        if countTitle(stories, element['title']) == 1:
-            result.update({element['slug']: element})
-    return result
-
-
 def getDetailStory(url):
     response = requests.get(detail_stories_url + url + '.json')
     if (response.status_code == 400):
@@ -150,10 +129,10 @@ def cleanHtmlTagInStory(htmlSource):
 # Execute code
 ##
 result = {}
-tags = getTags(page=0, limit=3)
+tags = getTags(page=0, limit=limit_tag)
 index = 0
 for t in tags.values():
-    stories = getStories(page=0, limit=3, tag=t)
+    stories = getStories(page=0, limit=limit_story, tag=t)
     for url, value in stories.items():
         clear()
         print('Đã crawl được', index + 1, '/', len(tags)*len(stories) ,'bài viết')
